@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expense</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">Expense Tracker System</div>
+
+<div class="container">
+    <h2>Add Expense</h2>
+
+    <input id="date" placeholder="Date">
+    <input id="category" placeholder="Category">
+    <input id="amount" placeholder="Amount">
+    <input id="desc" placeholder="Description">
+
+    <button onclick="saveExpense()">Save</button>
+    <button onclick="back()">Back</button>
+
+    <p id="msg" class="success"></p>
+</div>
+
+<script>
+function saveExpense(){
+
+    let exp = {
+        date: date.value,
+        category: category.value,
+        amount: amount.value,
+        desc: desc.value
+    };
+
+    let data = JSON.parse(localStorage.getItem("expenses")) || [];
+    data.push(exp);
+
+    localStorage.setItem("expenses", JSON.stringify(data));
+
+    msg.innerText = "Expense Saved!";
+    
+    date.value = "";
+    category.value = "";
+    amount.value = "";
+    desc.value = "";
+}
+
+function back(){
+    window.location.href = "dashboard.html";
+}
+</script>
+
+</body>
+</html>

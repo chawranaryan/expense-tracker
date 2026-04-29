@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">Expense Tracker System</div>
+
+<div class="container">
+    <h2>Login</h2>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <p>Forgot Password?</p>
+    <button onclick="forgotPassword()">Reset Password</button>
+
+    <p>Don't have account?</p>
+    <button onclick="goRegister()">Register</button>
+</div>
+
+<script>
+function login(){
+    let u = document.getElementById("username").value;
+    let p = document.getElementById("password").value;
+
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if(user && u === user.username && p === user.password){
+        window.location.href = "dashboard.html";
+    } else {
+        alert("Invalid Login!");
+    }
+}
+
+function goRegister(){
+    window.location.href = "register.html";
+}
+
+function forgotPassword(){
+    let user = JSON.parse(localStorage.getItem("user"));
+
+    if(!user){
+        alert("Register first!");
+        return;
+    }
+
+    let u = prompt("Enter username:");
+
+    if(u === user.username){
+        let newPass = prompt("Enter new password:");
+        user.password = newPass;
+        localStorage.setItem("user", JSON.stringify(user));
+        alert("Password updated!");
+    } else {
+        alert("Wrong username!");
+    }
+}
+</script>
+
+</body>
+</html>

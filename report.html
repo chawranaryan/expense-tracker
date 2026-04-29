@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Report</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="header">Expense Tracker System</div>
+
+<!-- ✅ ONLY CHANGE: container-wide -->
+<div class="container-wide">
+
+    <h2>📊 Expense Report</h2>
+
+    <!-- Table -->
+    <div style="overflow-x:auto;">
+        <table id="table">
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </table>
+    </div>
+
+    <h3 id="total"></h3>
+
+    <!-- Line Chart -->
+    <h3>📈 Expense Trend</h3>
+    <canvas id="myChart" height="100"></canvas>
+    <p id="noData" style="color:red;"></p>
+
+    <br>
+    <button onclick="back()">⬅ Back</button>
+
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("expenses")) || [];
+let table = document.getElementById("table");
+let total = 0;
+
+// Fill table
+data.forEach((e, index) => {
+
+    let row = table.insertRow();
+
+    row.insertCell(0).innerHTML = e.date;
+    row.insertCell(1).innerHTML = e.category;
+    row.insertCell(2).innerHTML = e.amount;
+    row.insertCell(3).innerHTML = e.desc;
+
+    let actionCell = row.insertCell(4);
+
+    // Edit button
+    let editBtn = document.createElement("button");
+    editBtn.innerText = "Edit";
+    editBtn.className = "action-btn edit-btn";
+
+    editBtn.onclick = function(){
+        let newDate = prompt("Edit Date:", e.date);
+        let newCategory = prompt("Edit Category:", e.category);
+        let newAmount = prompt("Edit Amount:", e.amount);
+        let newDesc = prompt("Edit Description:", e.desc);
+
+        if(newDate && newCategory && newAmount && newDesc){
+            data[index] = {
+                date: newDate,
+                category: newCategory,
+                amount: newAmount,
+                desc: newDesc
+            };
+            localStorage.setItem("expenses", JSON.stringify(data));
+            location.reload();
+        }
+    };
+
+    // Delete button
+    let deleteBtn = document.createElement("button");
+    deleteBtn.innerText = "Delete";
+    deleteBtn.className = "action-btn delete-btn";
+
+    deleteBtn.onclick = function(){
+        data.splice(index, 1);
+        localStorage.setItem("expenses", JSON.stringify(data));
+        location.reload();
+    };
+
+    actionCell.appendChild(editBtn);
+    actionCell.appendChild(deleteBtn);
+
+    total += parseFloat(e.amount) || 0;
+});
+
+// Show total
+document.getElementById("total").innerText = "Total Expense: ₹ " + total;
+
+
+// 📈 LINE CHART (TREND)
+window.addEventListener("load", function(){
+
+    // Sort by date
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    let labels = [];
+    let values = [];
+
+    data.forEach(e => {
+        if(e.date && !isNaN(parseFloat(e.amount))){
+            labels.push(e.date);
+            values.push(parseFloat(e.amount));
+        }
+    });
+
+    if(labels.length === 0){
+        document.getElementById("noData").innerText = "No data for chart";
+        return;
+    }
+
+    let ctx = document.getElementById("myChart").getContext("2d");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Expense Trend",
+                data: values,
+                borderColor: "#36a2eb",
+                backgroundColor: "rgba(54,162,235,0.2)",
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+});
+
+// Back button
+function back(){
+    window.location.href = "dashboard.html";
+}
+
+</script>
+
+</body>
+</html>
